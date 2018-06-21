@@ -15,6 +15,7 @@ Date: 2018/06/10
 |Initial	 |$3,000,000 |
 |Percentage Invested|30%|
 |Performance	|24.09%|
+|Gross Profit|13.38%|
 |Max Recovery	|48.04166667||Volatility	|11.9%|	
 |Minimum Draw Down	|-6.98%||Sharpe|1.975501601|
 
