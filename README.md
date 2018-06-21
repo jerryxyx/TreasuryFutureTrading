@@ -5,6 +5,7 @@ Strategy Engineer: Yuxuan(Jerry) Xia
 
 Date: 2018/06/10
 
+*Note: The advanced Marckdown features such as math expression may not be compatible in GitHub, please see README.pdf instead if you want more details*
 
 ### Performance:
 ![](Drift Performance.png)
