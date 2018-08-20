@@ -17,9 +17,38 @@ Date: 2018/06/10
 |Percentage Invested|30%|
 |Performance	|24.09%|
 |Gross Profit|13.38%|
-|Max Recovery	|48.04166667||Volatility	|11.9%|	
-|Minimum Draw Down	|-6.98%||Sharpe|1.975501601|
+|Max Recovery	|48.04166667|
+|Volatility	|11.9%|
+|Minimum Draw Down	|-6.98%|
+|Sharpe|1.975501601|
 
+### Input and Output
+
+One can view this as a python implementation about the excel program developed by Prof. Douady. But with much better time-efficiency and robustness. This project is made to replace the old excel back-testing system. And all columns can be found in the excel file "TradesResult 2017Drift_new position_with spot unfrozen duration_Raphael_2.xlsm"
+
+The system input is a data frame like the following, which we can calculate on the original matlab programs easily. Professor, Tony and Yao used to generate this data.
+
+| DateTime        | PriceTU  | PriceFV  | PriceTY  | PriceUS  | PriceUB  | DurationTU | DurationFV | DurationTY | DurationUS | DurationUB | OptWeightTU | OptWeightFV | OptWeightTY | OptWeightUS | OptWeightUB | RollingAvg | RollingStd |
+| --------------- | -------- | -------- | -------- | -------- | -------- | ---------- | ---------- | ---------- | ---------- | ---------- | ----------- | ----------- | ----------- | ----------- | ----------- | ---------- | ---------- |
+| 2001/2/17 19:00 | 108.2969 | 117.5234 | 124.0469 | 150.2188 | 159.5938 | 1.957515   | 4.24503    | 6.222844   | 13.85058   | 17.46846   | 0.239421    | 0.176399    | -0.1359     | -0.26366    | 0.184626    | 19.72937   | 0.027984   |
+
+The system output is a dataframe like the following. Along with the basic input columns, there are more information about the positions and performance of the DRIFT model which is marking to market hourly.
+
+| DateTime       | PriceTU  | PriceFV  | PriceTY  | PriceUS  | PriceUB  | OptWeightTU | OptWeightFV | OptWeightTY | OptWeightUS | OptWeightUB | PortNotional | dfPositionTU | dfPositionFV | dfPositionTY | dfPositionUS | dfPositionUB | PortPrice | InitMargin | DailyPnL | CumNetPnL |
+| -------------- | -------- | -------- | -------- | -------- | -------- | ----------- | ----------- | ----------- | ----------- | ----------- | ------------ | ------------ | ------------ | ------------ | ------------ | ------------ | --------- | ---------- | -------- | --------- |
+| 2017/1/2 19:00 | 108.2969 | 117.5234 | 124.0469 | 150.2188 | 159.5938 | 0.239421    | 0.176399    | -0.1359     | -0.26366    | 0.184626    | 57890.65     | 6.930119     | 10.21183     | -7.86725     | -15.2632     | 10.68813     | 19.66085  | 0          | 0        | 0         |
+
+PortNotional: portfolio notional
+
+dfPositionXX: positions according to different bonds
+
+PortPrice: portfolio price
+
+InitMargin: initial margin
+
+DailyPnL: daily P&L
+
+CumNetPnL: cumulative P&L
 
 ### Introduction:
 
@@ -42,15 +71,15 @@ Positions are closed when either a pre-specified profit is realized, or a stop-l
 ###  Parameters
 
 * Backtest period: Typical 2010-2017
-    
+  
 	The time period we choose to conduct backtesting in the experiment. We conduct simulations quarter per quarter. Specifically, the start year/quarter and the end year/quarter need to be given. 
-    
+  
 	If the quarter is not specified, it means that the full year (Q1-Q4) is simulated.
-     
+  
 * Number of components: Typical 5 
-    
+  
 	The number of different futures contracts that will be included in the portfolio. Typically 5 futures (see below).
-     
+  
 + Future contracts: Typical TU-FV-TY-US-UB
 
     The type of future contracts we choose to construct our portfolio. The most frequently used contracts include:
@@ -73,7 +102,7 @@ Positions are closed when either a pre-specified profit is realized, or a stop-l
     Currently, the frequency of simulations is hourly (1H)
     
 	We are planning simulations with frequency 10 minutes (10M) and 1 minute (1M).
- 
+
 * Hedging constraints: Typical 2
 
     We currently use only 2 constraints: sensitivity to paraller shift and to sloping by Log(T).
@@ -123,7 +152,7 @@ We use K = Thousands, MM = Millions, Bn = Billions
 * Investment ratio: 
 
     This ratio measures the percentage of initial portfolio that can be used in our trading. For example, if the initial value of portfolio is \$100 and we constraint that only \$20 can be used in trading. The value of this ratio is 5.
-     
+    
 * Entry Threshold: 
 
     A constant number which is set as a criteria of entering the market    
@@ -138,7 +167,7 @@ We use K = Thousands, MM = Millions, Bn = Billions
 
 * Minimum Change Quantity: Typical 200
     Considering trading cost, we only change our positions when the sum of absolute changes in all futures contracts are larger than the minimum change quantity.
- 
+
 ### Methodology
 At time t,
 
@@ -167,7 +196,7 @@ At time t,
     If $r_0$ got in step 1 is smaller than the enter ratio times bid-ask spread, calculate the optimized number of contracts of all futures according to $W_0$, required margins, and our portfolio value. Go to step 5. Otherwise, close our positions. Steps at time t end.
 
 * Step 5:
-    
+  
 	If the changes of optimized numbers of contracts from our current contract numbers are smaller than the minimum change quantity, keep positions unchanged. Otherwise, change our current positions to the optimized positions we calculate in step 4.
 
 ### Inputs Files
@@ -177,7 +206,7 @@ At time t,
     Futures' historical price data obtained from DTN.iqfeed by a Python program. Data is stored in csv file which is named after the futures contract's symbol in DTN. Each csv file consists of 7 columns. The 1st column shows the time, in a format of yyyy-mm-dd HH:mm:ss. 2nd to 5th column indicate the price of futures and 6th and 7th show that incremental volume and total volume. We only take the first column(date time information) and fifth column(close price information) in our back testing. 
   
 * Duration data
-    
+  
 	Basic information of bond's data is firstly obtained from WSJ dataset. We selected duration data from them and match them with futures contracts by date time. 
 
 ### Outputs Files
@@ -209,9 +238,9 @@ Input data can be obtained by the following MATLAB files which defined in Method
     to calculate durations and ln(duration)'s of bond.
 
 * fraction1.m: 
-    
+  
 	to get the objective function.
 
 * optimizeSharpe.m: 
-    
+  
 	to get the optimized W_0 and r_0 in Methodology step 
